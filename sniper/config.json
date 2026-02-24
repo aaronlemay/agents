@@ -17,6 +17,6 @@
     "GAS_BUFFER_KILL": 0,
     "MIN_ETH_BALANCE": "0.002",
     "MAX_DISPLAY_TARGETS": 10,
-    "DRY_RUN": false
+    "DRY_RUN": true
   }
 }

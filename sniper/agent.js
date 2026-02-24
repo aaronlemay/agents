@@ -134,14 +134,26 @@ async function main() {
         console.log(`${PNK}[STARTUP] Faucet skipped: ${e.reason || e.message}${RES}`);
     }
 
+    let hasTreasuryStats = true;
     while (true) {
         try {
-            const [ethBal, killBal, killAllow, treasuryStats] = await Promise.all([
+            const [ethBal, killBal, killAllow] = await Promise.all([
                 ethers.provider.getBalance(wallet.address),
                 killToken.balanceOf(wallet.address),
-                killToken.allowance(wallet.address, kill_game_addr),
-                killGame.getTreasuryStats()
+                killToken.allowance(wallet.address, kill_game_addr)
             ]);
+            let treasuryStats = {
+                totalTreasury: ethers.BigNumber.from(0),
+                globalMaxBounty: ethers.BigNumber.from(0)
+            };
+            if (hasTreasuryStats) {
+                try {
+                    treasuryStats = await killGame.getTreasuryStats();
+                } catch (_err) {
+                    hasTreasuryStats = false;
+                    console.log(`${YEL}[WARN] getTreasuryStats unavailable on this deployment; continuing without treasury metrics.${RES}`);
+                }
+            }
 
             const scanIds = Array.from({ length: GRID_SIZE }, (_, i) => i + 1);
             const stackCalls = scanIds.map((id) => killGame.interface.encodeFunctionData("getFullStack", [id]));
