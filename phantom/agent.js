@@ -39,7 +39,7 @@ function toRatio(numerator, denominator) {
 }
 
 function toK(v) {
-    return `${parseFloat(ethers.utils.formatEther(v)).toFixed(1)}K`;
+    return parseFloat(ethers.utils.formatEther(v)).toLocaleString(undefined, { maximumFractionDigits: 1 });
 }
 
 function roundUpToStep(value, step) {

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KILL UI Mock - Human Operator Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="brand">KILL</div>
+        <div class="subbrand">Human-Readable Operator Console (Mock)</div>
+      </div>
+      <div class="status-cluster">
+        <button id="openDeployModal" class="btn-primary">+ ADD AGENT</button>
+        <div class="block-readout">
+          <div class="block-label">BASE SEPOLIA BLOCK</div>
+          <div id="blockHeight" class="block-value">--------</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="matters-strip">
+      <article class="matters-card">
+        <span class="kicker">WHAT MATTERS NOW</span>
+        <h3>Best Target Value</h3>
+        <p id="bestTargetValue">0 KILL</p>
+      </article>
+      <article class="matters-card">
+        <span class="kicker">DECISION SIGNAL</span>
+        <h3>Est. Net Edge</h3>
+        <p id="netEdge">0.00 KILL</p>
+      </article>
+      <article class="matters-card">
+        <span class="kicker">RISK</span>
+        <h3>Risk State</h3>
+        <p id="riskState">STABLE</p>
+      </article>
+    </section>
+
+    <main class="main-grid">
+      <aside class="panel">
+        <h2>Human Action</h2>
+        <ol class="action-list">
+          <li>Fund agent wallet with Base Sepolia ETH.</li>
+          <li>Run installer command to deploy your bot.</li>
+          <li>Start in DRY_RUN and observe at least 3 cycles.</li>
+          <li>Flip LIVE only when expected net is positive.</li>
+        </ol>
+
+        <h3>Readiness Checklist</h3>
+        <div class="checklist">
+          <div class="check-row"><span>Wallet funded (&gt;= 0.02 ETH)</span><span id="checkWallet" class="chip chip-off">Needs Action</span></div>
+          <div class="check-row"><span>Agent running</span><span id="checkRunning" class="chip chip-off">Needs Action</span></div>
+          <div class="check-row"><span>Recent profit positive</span><span id="checkProfit" class="chip chip-off">Needs Action</span></div>
+          <div class="check-row"><span>Gas healthy</span><span id="checkGas" class="chip chip-off">Needs Action</span></div>
+        </div>
+
+        <div class="card">
+          <h3>First 10 Minutes</h3>
+          <ul>
+            <li>Fund 0.02-0.10 ETH.</li>
+            <li>Launch in DRY_RUN.</li>
+            <li>Go live after 3 profitable sims.</li>
+            <li>Set auto-pause drawdown to -5%.</li>
+          </ul>
+        </div>
+      </aside>
+
+      <section class="arena panel">
+        <h2>Battlefield View (Mock)</h2>
+        <p class="arena-note">Click a stack to inspect target details.</p>
+        <div id="battleGrid" class="battle-grid"></div>
+        <div id="stackInspector" class="inspector">
+          <p>Select a stack to see its expected value and kill quality.</p>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>Operator Metrics</h2>
+        <div class="metric-row"><span>Total Earned</span><strong id="totalEarned">0 KILL</strong></div>
+        <div class="metric-row"><span>Total Spent</span><strong id="totalSpent">0 KILL</strong></div>
+        <div class="metric-row"><span>Net Profit</span><strong id="netProfit">0 KILL</strong></div>
+        <div class="metric-row"><span>Gas per Kill</span><strong id="gasPerKill">0.0000 ETH</strong></div>
+
+        <h3>Simulation Controls</h3>
+        <div class="controls">
+          <button id="fundBtn">Fund +0.02 ETH</button>
+          <button id="toggleAgentBtn">Toggle Agent</button>
+          <button id="winCycleBtn">Simulate Win</button>
+          <button id="lossCycleBtn">Simulate Loss</button>
+        </div>
+
+        <div class="wallet-line">Wallet ETH: <strong id="walletEth">0.000 ETH</strong></div>
+        <div class="wallet-line">Agent Mode: <strong id="agentMode">DRY_RUN</strong></div>
+
+        <h3>Live Log</h3>
+        <div id="logFeed" class="log-feed"></div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="deployModal" class="modal hidden">
+    <div class="modal-panel">
+      <button id="closeDeployModal" class="close">x</button>
+      <h2>Agent Deployment</h2>
+      <p class="modal-subtitle">Operator-ready deployment checklist.</p>
+      <ol>
+        <li>Recommended bankroll: 0.02-0.10 ETH (Base Sepolia).</li>
+        <li>Run in DRY_RUN for 3 cycles before live mode.</li>
+        <li>Go live only when estimated net edge is positive.</li>
+        <li>Pause after 3 losing kills in a row.</li>
+      </ol>
+      <div class="code-row">
+        <code id="installCmd">curl -s https://killgame.ai/kill.sh | bash</code>
+        <button id="copyCmdBtn">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

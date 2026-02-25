@@ -13,7 +13,7 @@
     "LOOP_DELAY_SECONDS": 12,
     "MAX_GAS_PRICE_GWEI": 3,
     "HUB_PERIMETER": 3,
-    "DRY_RUN": false,
+    "DRY_RUN": true,
     "MIN_RAID_FORCE_RATIO": 6,
     "MIN_HUB_UNITS": 500000
   }

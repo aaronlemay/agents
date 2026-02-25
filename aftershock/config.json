@@ -1,0 +1,22 @@
+{
+  "role": "aftershock",
+  "network": {
+    "network_name": "basesepolia",
+    "rpc_url": "https://sepolia.base.org",
+    "kill_game_addr": "0x23e55f52C4215d7162861761C6063399E021BA3f",
+    "kill_faucet_addr": "0x9Cc9568A59935a471a3Bc161f3327E1586F4624e"
+  },
+  "settings": {
+    "HUB_STACK": 125,
+    "LOOP_DELAY_SECONDS": 12,
+    "LOOKBACK_BLOCKS": 120,
+    "HOT_STACK_MIN_KILLS": 2,
+    "OVERKILL_RATIO": 8,
+    "MIN_FORCE_RATIO": 4,
+    "MIN_BOUNTY_FOR_SPAWN": "200000",
+    "MAX_GAS_PRICE_GWEI": 1,
+    "MAX_GAS_LIMIT": 220000,
+    "MIN_ETH_BALANCE": "0.0002",
+    "DRY_RUN": true
+  }
+}

@@ -22,6 +22,6 @@
     "MIN_ETH_BALANCE": "0.003",
     "MIN_HUB_RESERVE": "500000",
     "SCOUT_SEND_UNITS": "2664",
-    "DRY_RUN": false
+    "DRY_RUN": true
   }
 }

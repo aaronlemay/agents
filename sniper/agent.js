@@ -50,7 +50,7 @@ function roundUpToStep(value, step) {
 
 function toFloatRatio(numerator, denominator) {
     if (denominator.lte(0)) return 0;
-    return parseFloat(numerator.mul(10000).div(denominator).toString()) / 10000;
+    return parseFloat(ethers.utils.formatEther(numerator.mul(10000).div(denominator))) / 10000;
 }
 
 function calcSpawnPlan(enemyPower, cfg) {
@@ -66,7 +66,7 @@ function calcSpawnPlan(enemyPower, cfg) {
 }
 
 function formatK(value) {
-    return `${(parseFloat(ethers.utils.formatEther(value))).toFixed(1)}K`;
+    return parseFloat(ethers.utils.formatEther(value)).toLocaleString(undefined, { maximumFractionDigits: 1 });
 }
 
 function pickHighestBountyEnemy(enemies) {
@@ -89,11 +89,21 @@ async function main() {
         LOOP_DELAY_SECONDS: Number(settings.LOOP_DELAY_SECONDS ?? 12),
         SPAWN_PROFITABILITY_THRESHOLD: Number(settings.SPAWN_PROFITABILITY_THRESHOLD ?? 1.05),
         MIN_FORCE_RATIO: Number(settings.MIN_FORCE_RATIO ?? 5),
+        DIRECT_KILL_MIN_FORCE_RATIO: Number(settings.DIRECT_KILL_MIN_FORCE_RATIO ?? 1.5),
+        MIN_BOUNTY_FOR_SPAWN: ethers.utils.parseEther((settings.MIN_BOUNTY_FOR_SPAWN ?? "250000").toString()),
+        THREAT_MIN_FORCE_RATIO: Number(settings.THREAT_MIN_FORCE_RATIO ?? 6),
         OVERKILL_RATIO: ethers.BigNumber.from(settings.OVERKILL_RATIO ?? 8),
         MIN_SPAWN: ethers.BigNumber.from(settings.MIN_SPAWN ?? 666),
         SPAWN_STEP: ethers.BigNumber.from(settings.SPAWN_STEP ?? 666),
         GAS_BUFFER_KILL: ethers.BigNumber.from(settings.GAS_BUFFER_KILL ?? 0),
         MIN_ETH_BALANCE: ethers.utils.parseEther((settings.MIN_ETH_BALANCE ?? "0.002").toString()),
+        MAX_GAS_PRICE_GWEI: Number(settings.MAX_GAS_PRICE_GWEI ?? 2),
+        MAX_GAS_LIMIT: Number(settings.MAX_GAS_LIMIT ?? 1200000),
+        THREAT_STACK_THRESHOLD: Number(settings.THREAT_STACK_THRESHOLD ?? 14),
+        THREAT_LAYER_STACK_THRESHOLD: Number(settings.THREAT_LAYER_STACK_THRESHOLD ?? 6),
+        THREAT_POWER_THRESHOLD: ethers.BigNumber.from(settings.THREAT_POWER_THRESHOLD ?? "400000"),
+        MAX_ATTACK_HOPS_FROM_HUB_UNDER_THREAT: Number(settings.MAX_ATTACK_HOPS_FROM_HUB_UNDER_THREAT ?? 2),
+        MAX_STRANDED_BEFORE_RETREAT: Number(settings.MAX_STRANDED_BEFORE_RETREAT ?? 4),
         MAX_DISPLAY_TARGETS: Number(settings.MAX_DISPLAY_TARGETS ?? 10),
         DRY_RUN: Boolean(settings.DRY_RUN ?? false)
     };
@@ -160,7 +170,9 @@ async function main() {
             const results = await killGame.callStatic.multicall(stackCalls);
 
             const myStrandedStacks = [];
+            const directKillOps = [];
             const targets = [];
+            const enemyPressure = new Map();
             let hubSelf = null;
             let hubEnemy = null;
 
@@ -188,6 +200,17 @@ async function main() {
                     const spawnPlan = calcSpawnPlan(enemyPower, cfg);
                     const forceRatio = toFloatRatio(spawnPlan.spawnPower, enemyPower);
                     const roiRatio = toFloatRatio(e.pendingBounty, spawnPlan.attackCost);
+                    const enemyAddr = e.occupant.toLowerCase();
+                    const z = getCoords(stackId).z;
+                    const cur = enemyPressure.get(enemyAddr) || {
+                        count: 0,
+                        totalPower: ethers.BigNumber.from(0),
+                        layers: new Map()
+                    };
+                    cur.count += 1;
+                    cur.totalPower = cur.totalPower.add(enemyPower);
+                    cur.layers.set(z, (cur.layers.get(z) || 0) + 1);
+                    enemyPressure.set(enemyAddr, cur);
 
                     targets.push({
                         id: stackId,
@@ -198,10 +221,54 @@ async function main() {
                         ...spawnPlan
                     });
                 }
+
+                // Capital-efficient: if we already occupy a stack with enemies, prefer direct kill (no spawn).
+                if (self && stackId !== cfg.HUB_STACK && enemies.length > 0) {
+                    const selfPower = calcPower(self.units, self.reapers);
+                    const bestLocalEnemy = pickHighestBountyEnemy(enemies);
+                    const localEnemyPower = calcPower(bestLocalEnemy.units, bestLocalEnemy.reapers);
+                    const localForce = toFloatRatio(selfPower, localEnemyPower);
+                    directKillOps.push({
+                        id: stackId,
+                        self,
+                        enemy: bestLocalEnemy,
+                        forceRatio: localForce
+                    });
+                }
             }
 
             const rankedTargets = targets.sort((a, b) => b.roiRatio - a.roiRatio);
-            const best = rankedTargets[0];
+            let dominantThreat = null;
+            for (const [addr, p] of enemyPressure.entries()) {
+                let maxLayerCount = 0;
+                for (const c of p.layers.values()) maxLayerCount = Math.max(maxLayerCount, c);
+                const threatening = (
+                    p.count >= cfg.THREAT_STACK_THRESHOLD ||
+                    maxLayerCount >= cfg.THREAT_LAYER_STACK_THRESHOLD ||
+                    p.totalPower.gte(cfg.THREAT_POWER_THRESHOLD)
+                );
+                if (threatening) {
+                    if (!dominantThreat || p.totalPower.gt(dominantThreat.totalPower)) {
+                        dominantThreat = { addr, ...p, maxLayerCount };
+                    }
+                }
+            }
+
+            const effectiveMinForce = dominantThreat ? cfg.THREAT_MIN_FORCE_RATIO : cfg.MIN_FORCE_RATIO;
+            const nearHubTargets = rankedTargets.filter((t) => getPath3D(cfg.HUB_STACK, t.id).length <= cfg.MAX_ATTACK_HOPS_FROM_HUB_UNDER_THREAT);
+            const candidateTargetsBase = dominantThreat
+                ? (nearHubTargets.length > 0 ? nearHubTargets : rankedTargets)
+                : rankedTargets;
+            const candidateTargets = dominantThreat
+                ? candidateTargetsBase.slice().sort((a, b) => {
+                    const aThreat = a.enemy.occupant.toLowerCase() === dominantThreat.addr ? 1 : 0;
+                    const bThreat = b.enemy.occupant.toLowerCase() === dominantThreat.addr ? 1 : 0;
+                    if (aThreat !== bThreat) return bThreat - aThreat;
+                    if (!a.enemy.pendingBounty.eq(b.enemy.pendingBounty)) return b.enemy.pendingBounty.gt(a.enemy.pendingBounty) ? 1 : -1;
+                    return b.roiRatio - a.roiRatio;
+                })
+                : candidateTargetsBase;
+            const best = candidateTargets[0];
 
             console.clear();
             console.log(`${BRIGHT}--- SNIPER AGENT | STATUS ---${RES}`);
@@ -212,6 +279,11 @@ async function main() {
                 TREASURY: formatK(treasuryStats.totalTreasury),
                 MAX_BOUNTY: formatK(treasuryStats.globalMaxBounty)
             }]);
+            if (dominantThreat) {
+                console.log(
+                    `${YEL}[THREAT] ${dominantThreat.addr.slice(0, 10)} stacks=${dominantThreat.count} maxLayer=${dominantThreat.maxLayerCount} power=${dominantThreat.totalPower.toString()}${RES}`
+                );
+            }
 
             if (myStrandedStacks.length > 0) {
                 console.log(`\n${BRIGHT}${PNK}STRANDED UNITS${RES}`);
@@ -225,7 +297,7 @@ async function main() {
             console.log("-----|------------|--------|----------|-------|-------|-------");
             rankedTargets.slice(0, cfg.MAX_DISPLAY_TARGETS).forEach((t) => {
                 const passRoi = t.roiRatio >= cfg.SPAWN_PROFITABILITY_THRESHOLD;
-                const passForce = t.forceRatio >= cfg.MIN_FORCE_RATIO;
+                const passForce = t.forceRatio >= effectiveMinForce;
                 let status = "LOW_ROI";
                 if (passRoi && !passForce) status = "LOW_FORCE";
                 if (passRoi && passForce && killBal.lt(t.attackCost)) status = "NO_KILL";
@@ -236,6 +308,13 @@ async function main() {
             });
 
             const calls = [];
+            let defendedHub = false;
+            const directKill = directKillOps
+                .filter((op) => op.forceRatio >= cfg.DIRECT_KILL_MIN_FORCE_RATIO)
+                .sort((a, b) => {
+                    if (!a.enemy.pendingBounty.eq(b.enemy.pendingBounty)) return b.enemy.pendingBounty.gt(a.enemy.pendingBounty) ? 1 : -1;
+                    return b.forceRatio - a.forceRatio;
+                })[0];
             // Priority 1: Hub touched -> immediate purge.
             if (hubEnemy && hubSelf) {
                 const ownHubPower = calcPower(hubSelf.units, hubSelf.reapers);
@@ -252,11 +331,37 @@ async function main() {
                             hubSelf.reapers
                         ])
                     );
+                    defendedHub = true;
+                } else {
+                    console.log(`\n${YEL}[DEFENSE] Hub touched but force ${hubForceRatio.toFixed(2)}x below ${cfg.MIN_FORCE_RATIO}x; switching to counter actions.${RES}`);
                 }
             }
-            // Priority 2: Highest ROI + safe force attack.
-            else if (best && best.roiRatio >= cfg.SPAWN_PROFITABILITY_THRESHOLD && best.forceRatio >= cfg.MIN_FORCE_RATIO) {
-                if (ethBal.gt(cfg.MIN_ETH_BALANCE) && killBal.gte(best.attackCost)) {
+            // Priority 2: Harvest guaranteed local bounty first (no spawn cost).
+            if (!defendedHub && directKill) {
+                console.log(`\n${CYA}[HUNTER] Direct kill on ${directKill.id} | force ${directKill.forceRatio.toFixed(2)}x${RES}`);
+                calls.push(
+                    killGame.interface.encodeFunctionData("kill", [
+                        directKill.enemy.occupant,
+                        directKill.id,
+                        directKill.self.units,
+                        directKill.self.reapers
+                    ])
+                );
+            }
+            // Priority 3: Under layer-wipe pressure, consolidate first.
+            else if (!defendedHub && dominantThreat && myStrandedStacks.length > 0) {
+                const retreat = myStrandedStacks
+                    .map((s) => ({ ...s, hops: getPath3D(s.id, cfg.HUB_STACK).length }))
+                    .sort((a, b) => b.hops - a.hops)[0];
+                const moveStep = getPath3D(retreat.id, cfg.HUB_STACK)[0];
+                if (moveStep) {
+                    console.log(`\n${YEL}[COUNTER] Consolidating ${retreat.id} -> ${moveStep.to} under threat${RES}`);
+                    calls.push(killGame.interface.encodeFunctionData("move", [moveStep.from, moveStep.to, retreat.units, retreat.reapers]));
+                }
+            }
+            // Priority 4: Spawn+kill only for larger bounties with safe force.
+            else if (!defendedHub && best && best.roiRatio >= cfg.SPAWN_PROFITABILITY_THRESHOLD && best.forceRatio >= effectiveMinForce) {
+                if (best.enemy.pendingBounty.gte(cfg.MIN_BOUNTY_FOR_SPAWN) && ethBal.gt(cfg.MIN_ETH_BALANCE) && killBal.gte(best.attackCost)) {
                     if (killAllow.lt(best.attackCost)) {
                         console.log(`${YEL}[AUTH] Approving...${RES}`);
                         await (await killToken.approve(kill_game_addr, ethers.constants.MaxUint256)).wait();
@@ -273,8 +378,8 @@ async function main() {
                     );
                 }
             }
-            // Priority 3: Consolidate one stranded stack.
-            else if (myStrandedStacks.length > 0) {
+            // Priority 5: Consolidate one stranded stack.
+            else if (!defendedHub && myStrandedStacks.length > 0) {
                 const s = myStrandedStacks[0];
                 const moveStep = getPath3D(s.id, cfg.HUB_STACK)[0];
                 if (moveStep) {
@@ -284,14 +389,36 @@ async function main() {
             }
 
             if (calls.length > 0) {
+                if (!cfg.DRY_RUN && ethBal.lte(cfg.MIN_ETH_BALANCE)) {
+                    console.log(`${YEL}[HOLD] ETH ${ethers.utils.formatEther(ethBal)} below floor ${ethers.utils.formatEther(cfg.MIN_ETH_BALANCE)}; skipping tx.${RES}`);
+                } else {
                 // Pre-flight simulation to avoid revert costs.
                 await killGame.callStatic.multicall(calls);
                 if (cfg.DRY_RUN) {
                     console.log(`${YEL}[DRY_RUN] Simulation passed. Transaction not sent.${RES}`);
                 } else {
-                    const tx = await killGame.multicall(calls, { gasLimit: 2500000 });
-                    console.log(`${CYA}>> [TX]: ${tx.hash}${RES}`);
-                    await tx.wait();
+                    let gasLimit = ethers.BigNumber.from(cfg.MAX_GAS_LIMIT);
+                    const gasPrice = ethers.utils.parseUnits(cfg.MAX_GAS_PRICE_GWEI.toString(), "gwei");
+                    try {
+                        const est = await killGame.estimateGas.multicall(calls);
+                        const padded = est.mul(120).div(100);
+                        gasLimit = padded.lt(gasLimit) ? padded : gasLimit;
+                    } catch (_estErr) {
+                        // Fallback to configured cap if estimate fails.
+                    }
+
+                    const txCostWei = gasLimit.mul(gasPrice);
+                    if (ethBal.lte(txCostWei.mul(105).div(100))) {
+                        console.log(`${YEL}[HOLD] Est. tx cost ${ethers.utils.formatEther(txCostWei)} ETH exceeds safe spend at current balance ${ethers.utils.formatEther(ethBal)}.${RES}`);
+                    } else {
+                        const tx = await killGame.multicall(calls, {
+                            gasLimit,
+                            gasPrice
+                        });
+                        console.log(`${CYA}>> [TX]: ${tx.hash}${RES}`);
+                        await tx.wait();
+                    }
+                }
                 }
             }
         } catch (err) {
