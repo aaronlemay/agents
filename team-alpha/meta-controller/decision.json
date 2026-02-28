@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-02-26T18:42:21.135Z",
+  "playbook": {
+    "id": "scout_hardening",
+    "summary": "All agents in DRY_RUN; gather intel and avoid gas burn.",
+    "agent_modes": {
+      "sniper": "dry_run",
+      "aftershock": "dry_run",
+      "phantom": "dry_run",
+      "fortress": "dry_run",
+      "layer-harvester": "dry_run"
+    }
+  },
+  "reason": "ETH 0.000029 below min_live_eth 0.0003",
+  "state": {
+    "updated": "2026-02-26T18:42:05.266Z",
+    "block": 38181517,
+    "wallet": "0x6646aDbdF4fe1275e43dE83b7cf5BA4541b8B23E",
+    "eth": 0.000028821034984643,
+    "kill": 100105361.27880117,
+    "threatAddr": "0x2fb363fbc806ee9e86ab406b8053875a9026be7d",
+    "threatStacks": 244,
+    "topRoi": 5,
+    "opportunities": 6
+  },
+  "thresholds": {
+    "min_live_eth": 0.0003,
+    "min_compound_eth": 0.0015,
+    "high_threat_stacks": 200,
+    "max_failure_streak": 2,
+    "min_viable_roi": 1.15
+  },
+  "constraints": {
+    "max_eth_spend_per_tx": 0.00012,
+    "max_parallel_live_agents": 1
+  },
+  "applyResult": {
+    "applyMode": true,
+    "updated": 5,
+    "skipped": 0,
+    "failed": 0,
+    "details": [
+      {
+        "agent": "sniper",
+        "status": "updated",
+        "note": "DRY_RUN=true"
+      },
+      {
+        "agent": "aftershock",
+        "status": "updated",
+        "note": "DRY_RUN=true"
+      },
+      {
+        "agent": "phantom",
+        "status": "updated",
+        "note": "DRY_RUN=true"
+      },
+      {
+        "agent": "fortress",
+        "status": "updated",
+        "note": "DRY_RUN=true"
+      },
+      {
+        "agent": "layer-harvester",
+        "status": "updated",
+        "note": "DRY_RUN=true"
+      }
+    ]
+  }
+}

@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3200" height="2060" viewBox="0 0 3200 2060">
+  <defs>
+    <style>
+      .bg { fill: #0b0f14; }
+      .panel { fill: #121a24; stroke: #2a3b4f; stroke-width: 3; rx: 18; }
+      .title { fill: #ff4d7a; font-family: Arial, sans-serif; font-size: 64px; font-weight: 700; }
+      .subtitle { fill: #a9bfd6; font-family: Arial, sans-serif; font-size: 32px; }
+      .h2 { fill: #5ac8ff; font-family: Arial, sans-serif; font-size: 42px; font-weight: 700; }
+      .node { fill: #1a2634; stroke: #4d6c8d; stroke-width: 3; rx: 14; }
+      .node2 { fill: #1c2e2b; stroke: #35a381; stroke-width: 3; rx: 14; }
+      .node3 { fill: #2d2417; stroke: #c8a66a; stroke-width: 3; rx: 14; }
+      .txt { fill: #e4edf7; font-family: Arial, sans-serif; font-size: 28px; font-weight: 600; }
+      .small { fill: #c6d4e3; font-family: Arial, sans-serif; font-size: 24px; }
+      .impact { fill: #ffd998; font-family: Arial, sans-serif; font-size: 23px; }
+      .arrow { stroke: #85a8c9; stroke-width: 4; marker-end: url(#arrowhead); fill: none; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto">
+      <polygon points="0 0, 12 5, 0 10" fill="#85a8c9" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="3200" height="2060"/>
+
+  <text class="title" x="80" y="105">KillTheGame.ai Agent Blueprint</text>
+  <text class="subtitle" x="80" y="152">Presentation Version: system map, decision flow, and tuning controls</text>
+
+  <rect class="panel" x="70" y="200" width="3060" height="500"/>
+  <text class="h2" x="110" y="265">1) System Map</text>
+
+  <rect class="node" x="130" y="330" width="380" height="120"/>
+  <text class="txt" x="220" y="402">Operator UI</text>
+
+  <rect class="node" x="600" y="330" width="420" height="120"/>
+  <text class="txt" x="690" y="402">Agent Configs</text>
+
+  <rect class="node" x="1120" y="275" width="300" height="95"/>
+  <text class="small" x="1230" y="333">Sniper</text>
+  <rect class="node" x="1120" y="390" width="300" height="95"/>
+  <text class="small" x="1215" y="448">Fortress</text>
+  <rect class="node" x="1120" y="505" width="300" height="95"/>
+  <text class="small" x="1218" y="563">Phantom</text>
+
+  <rect class="node" x="1510" y="330" width="420" height="120"/>
+  <text class="txt" x="1598" y="402">Base RPC + Chain</text>
+
+  <rect class="node" x="2020" y="330" width="430" height="120"/>
+  <text class="txt" x="2095" y="402">KILL Game Contract</text>
+
+  <rect class="node" x="2540" y="330" width="520" height="120"/>
+  <text class="txt" x="2690" y="390">Intel + Events</text>
+  <text class="small" x="2660" y="425">Spawn / Kill / Move / Leaderboard</text>
+
+  <line class="arrow" x1="510" y1="390" x2="600" y2="390"/>
+  <line class="arrow" x1="1020" y1="390" x2="1120" y2="320"/>
+  <line class="arrow" x1="1020" y1="390" x2="1120" y2="437"/>
+  <line class="arrow" x1="1020" y1="390" x2="1120" y2="552"/>
+  <line class="arrow" x1="1420" y1="320" x2="1510" y2="380"/>
+  <line class="arrow" x1="1420" y1="437" x2="1510" y2="390"/>
+  <line class="arrow" x1="1420" y1="552" x2="1510" y2="400"/>
+  <line class="arrow" x1="1930" y1="390" x2="2020" y2="390"/>
+  <line class="arrow" x1="2450" y1="390" x2="2540" y2="390"/>
+  <line class="arrow" x1="2540" y1="480" x2="1020" y2="480"/>
+
+  <rect class="panel" x="70" y="760" width="1990" height="1240"/>
+  <text class="h2" x="110" y="825">2) Sniper Decision Flow (Low-ETH Harvest)</text>
+
+  <rect class="node2" x="140" y="900" width="420" height="110"/>
+  <text class="txt" x="255" y="968">Start Loop</text>
+
+  <rect class="node2" x="670" y="900" width="510" height="110"/>
+  <text class="txt" x="760" y="968">Read ETH / KILL / Stacks</text>
+
+  <rect class="node2" x="1290" y="900" width="590" height="110"/>
+  <text class="txt" x="1410" y="968">Threat + Target Ranking</text>
+
+  <rect class="node2" x="140" y="1130" width="450" height="110"/>
+  <text class="small" x="210" y="1198">Hub under attack and force OK?</text>
+
+  <rect class="node2" x="680" y="1130" width="450" height="110"/>
+  <text class="small" x="772" y="1198">Direct kill available?</text>
+
+  <rect class="node2" x="1220" y="1130" width="600" height="110"/>
+  <text class="small" x="1325" y="1198">Spawn edge above threshold?</text>
+
+  <rect class="node3" x="140" y="1360" width="450" height="110"/>
+  <text class="small" x="250" y="1428">Defend / Consolidate</text>
+
+  <rect class="node3" x="680" y="1360" width="450" height="110"/>
+  <text class="small" x="800" y="1428">Direct Kill (No Spawn)</text>
+
+  <rect class="node3" x="1220" y="1360" width="600" height="110"/>
+  <text class="small" x="1460" y="1428">Spawn + Kill</text>
+
+  <rect class="node" x="680" y="1600" width="450" height="110"/>
+  <text class="small" x="765" y="1668">Gas + Affordability Check</text>
+
+  <rect class="node" x="140" y="1810" width="450" height="100"/>
+  <text class="small" x="320" y="1868">Hold</text>
+
+  <rect class="node" x="680" y="1810" width="450" height="100"/>
+  <text class="small" x="845" y="1868">Send TX</text>
+
+  <rect class="node" x="1220" y="1810" width="600" height="100"/>
+  <text class="small" x="1450" y="1868">Next Cycle</text>
+
+  <line class="arrow" x1="560" y1="955" x2="670" y2="955"/>
+  <line class="arrow" x1="1180" y1="955" x2="1290" y2="955"/>
+  <line class="arrow" x1="1580" y1="1010" x2="365" y2="1130"/>
+  <line class="arrow" x1="1580" y1="1010" x2="905" y2="1130"/>
+  <line class="arrow" x1="1580" y1="1010" x2="1520" y2="1130"/>
+  <line class="arrow" x1="365" y1="1240" x2="365" y2="1360"/>
+  <line class="arrow" x1="905" y1="1240" x2="905" y2="1360"/>
+  <line class="arrow" x1="1520" y1="1240" x2="1520" y2="1360"/>
+  <line class="arrow" x1="365" y1="1470" x2="800" y2="1600"/>
+  <line class="arrow" x1="905" y1="1470" x2="905" y2="1600"/>
+  <line class="arrow" x1="1520" y1="1470" x2="1120" y2="1600"/>
+  <line class="arrow" x1="905" y1="1710" x2="365" y2="1810"/>
+  <line class="arrow" x1="905" y1="1710" x2="905" y2="1810"/>
+  <line class="arrow" x1="905" y1="1710" x2="1520" y2="1810"/>
+
+  <rect class="panel" x="2130" y="760" width="1000" height="1240"/>
+  <text class="h2" x="2170" y="825">3) Customization Knobs</text>
+
+  <rect class="node" x="2200" y="900" width="860" height="140"/>
+  <text class="txt" x="2240" y="955">MIN_ETH_BALANCE</text>
+  <text class="impact" x="2240" y="1002">Higher = safer, fewer trades | Lower = more trades on thin gas</text>
+
+  <rect class="node" x="2200" y="1070" width="860" height="140"/>
+  <text class="txt" x="2240" y="1125">MAX_GAS_PRICE_GWEI + MAX_GAS_LIMIT</text>
+  <text class="impact" x="2240" y="1172">Caps tx spend ceiling; core control for low-ETH survival</text>
+
+  <rect class="node" x="2200" y="1240" width="860" height="140"/>
+  <text class="txt" x="2240" y="1295">MIN_FORCE_RATIO + DIRECT_KILL_MIN_FORCE_RATIO</text>
+  <text class="impact" x="2240" y="1342">Risk dial: higher = safer wins, lower = more aggressive entry</text>
+
+  <rect class="node" x="2200" y="1410" width="860" height="140"/>
+  <text class="txt" x="2240" y="1465">SPAWN_PROFITABILITY_THRESHOLD + MIN_BOUNTY_FOR_SPAWN</text>
+  <text class="impact" x="2240" y="1512">Spawn filter: raise to disable expensive spawn plays</text>
+
+  <rect class="node" x="2200" y="1580" width="860" height="140"/>
+  <text class="txt" x="2240" y="1635">DRY_RUN</text>
+  <text class="impact" x="2240" y="1682">true = simulate only | false = execute transactions</text>
+
+  <text class="small" x="2200" y="1820">Current profile: live sniper only, spawn path effectively disabled, strict gas cap.</text>
+</svg>

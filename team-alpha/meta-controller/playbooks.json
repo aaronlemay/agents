@@ -1,0 +1,48 @@
+{
+  "playbooks": [
+    {
+      "id": "scout_hardening",
+      "summary": "All agents in DRY_RUN; gather intel and avoid gas burn.",
+      "agent_modes": {
+        "sniper": "dry_run",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "dry_run"
+      }
+    },
+    {
+      "id": "parasite_compound",
+      "summary": "Single live executor follows high-activity zones and farms leftovers.",
+      "agent_modes": {
+        "sniper": "dry_run",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "live"
+      }
+    },
+    {
+      "id": "honeypot_lure",
+      "summary": "Place bait/seed actions, then switch to local direct-kill defense.",
+      "agent_modes": {
+        "sniper": "live",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "live"
+      }
+    },
+    {
+      "id": "sector_nuke_window",
+      "summary": "Time-bounded high-force burst on one section/layer when bankroll supports it.",
+      "agent_modes": {
+        "sniper": "live",
+        "aftershock": "live",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "live"
+      }
+    }
+  ]
+}

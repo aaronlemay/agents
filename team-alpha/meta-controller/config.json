@@ -1,0 +1,30 @@
+{
+  "team": "Agent Team Alpha",
+  "paths": {
+    "intel_report": "/Users/aaronlemay/agents/intel_report.md",
+    "decision_json": "/Users/aaronlemay/agents/team-alpha/meta-controller/decision.json",
+    "decision_md": "/Users/aaronlemay/agents/team-alpha/meta-controller/decision.md",
+    "agent_configs": {
+      "sniper": "/Users/aaronlemay/agents/sniper/config.json",
+      "aftershock": "/Users/aaronlemay/agents/aftershock/config.json",
+      "phantom": "/Users/aaronlemay/agents/phantom/config.json",
+      "fortress": "/Users/aaronlemay/agents/fortress/config.json",
+      "layer-harvester": "/Users/aaronlemay/agents/layer-harvester/config.json"
+    }
+  },
+  "thresholds": {
+    "min_live_eth": 0.0003,
+    "min_compound_eth": 0.0015,
+    "high_threat_stacks": 200,
+    "max_failure_streak": 2,
+    "min_viable_roi": 1.15
+  },
+  "constraints": {
+    "max_eth_spend_per_tx": 0.00012,
+    "max_parallel_live_agents": 1
+  },
+  "defaults": {
+    "base_playbook": "scout_hardening",
+    "apply_changes": false
+  }
+}

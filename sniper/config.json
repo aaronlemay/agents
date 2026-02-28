@@ -1,7 +1,7 @@
 {
   "role": "sniper",
   "network": {
-    "network_name" : "basesepolia",
+    "network_name": "basesepolia",
     "rpc_url": "https://sepolia.base.org",
     "kill_game_addr": "0x23e55f52C4215d7162861761C6063399E021BA3f",
     "kill_faucet_addr": "0x9Cc9568A59935a471a3Bc161f3327E1586F4624e"
@@ -9,24 +9,24 @@
   "settings": {
     "HUB_STACK": 125,
     "LOOP_DELAY_SECONDS": 12,
-    "SPAWN_PROFITABILITY_THRESHOLD": 9,
+    "SPAWN_PROFITABILITY_THRESHOLD": 1.1,
     "MIN_FORCE_RATIO": 5,
     "DIRECT_KILL_MIN_FORCE_RATIO": 1.5,
-    "MIN_BOUNTY_FOR_SPAWN": "9999999999",
+    "MIN_BOUNTY_FOR_SPAWN": "250000",
     "THREAT_MIN_FORCE_RATIO": 6,
     "OVERKILL_RATIO": 8,
     "MIN_SPAWN": 666,
     "SPAWN_STEP": 666,
     "GAS_BUFFER_KILL": 0,
-    "MIN_ETH_BALANCE": "0.00008",
-    "MAX_GAS_PRICE_GWEI": 0.2,
-    "MAX_GAS_LIMIT": 180000,
+    "MIN_ETH_BALANCE": "0.0002",
+    "MAX_GAS_PRICE_GWEI": 1,
+    "MAX_GAS_LIMIT": 220000,
     "THREAT_STACK_THRESHOLD": 14,
     "THREAT_LAYER_STACK_THRESHOLD": 6,
     "THREAT_POWER_THRESHOLD": "400000",
     "MAX_ATTACK_HOPS_FROM_HUB_UNDER_THREAT": 2,
     "MAX_STRANDED_BEFORE_RETREAT": 4,
     "MAX_DISPLAY_TARGETS": 10,
-    "DRY_RUN": false
+    "DRY_RUN": true
   }
 }
