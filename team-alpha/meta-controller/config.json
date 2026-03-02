@@ -9,19 +9,22 @@
       "aftershock": "/Users/aaronlemay/agents/aftershock/config.json",
       "phantom": "/Users/aaronlemay/agents/phantom/config.json",
       "fortress": "/Users/aaronlemay/agents/fortress/config.json",
-      "layer-harvester": "/Users/aaronlemay/agents/layer-harvester/config.json"
+      "layer-harvester": "/Users/aaronlemay/agents/layer-harvester/config.json",
+      "sentinel": "/Users/aaronlemay/agents/sentinel/config.json",
+      "parasite": "/Users/aaronlemay/agents/parasite/config.json",
+      "seeder": "/Users/aaronlemay/agents/seeder/config.json"
     }
   },
   "thresholds": {
-    "min_live_eth": 0.0003,
-    "min_compound_eth": 0.0015,
-    "high_threat_stacks": 200,
+    "min_live_eth": 0.0002,
+    "min_compound_eth": 0.0009,
+    "high_threat_stacks": 150,
     "max_failure_streak": 2,
-    "min_viable_roi": 1.15
+    "min_viable_roi": 1.18
   },
   "constraints": {
-    "max_eth_spend_per_tx": 0.00012,
-    "max_parallel_live_agents": 1
+    "max_eth_spend_per_tx": 0.00009,
+    "max_parallel_live_agents": 2
   },
   "defaults": {
     "base_playbook": "scout_hardening",

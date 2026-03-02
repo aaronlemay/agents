@@ -1,0 +1,40 @@
+#!/bin/zsh
+set -euo pipefail
+
+cd /Users/aaronlemay/agents
+
+BLOCKS="${BLOCKS:-40}"
+TOPUP_TX="${TOPUP_TX:-6}"
+TOPUP_UNITS="${TOPUP_UNITS:-1332}"
+TARGET_STACKS="${TARGET_STACKS:-99,138,83,116,61,186}"
+STRIKE_CYCLES="${STRIKE_CYCLES:-4}"
+STRIKE_MAX_TX="${STRIKE_MAX_TX:-18}"
+MIN_FORCE_RATIO="${MIN_FORCE_RATIO:-1.1}"
+MIN_BOUNTY="${MIN_BOUNTY:-5000}"
+FALLBACK_MIN_BOUNTY="${FALLBACK_MIN_BOUNTY:-2000}"
+LOOP_DELAY_MS="${LOOP_DELAY_MS:-900}"
+PRIORITY_STACKS="${PRIORITY_STACKS:-99,138,83,116,61,186,2}"
+
+for i in $(seq 1 "$BLOCKS"); do
+  echo "========== BLOCK_${i} TOPUP =========="
+  FORCE_TOPUP=true \
+  MAX_TX="$TOPUP_TX" \
+  SPAWN_UNITS="$TOPUP_UNITS" \
+  TARGET_STACKS="$TARGET_STACKS" \
+  node scripts/hotspot_bootstrap.js
+
+  echo "========== BLOCK_${i} STRIKE =========="
+  CYCLES="$STRIKE_CYCLES" \
+  MAX_TX="$STRIKE_MAX_TX" \
+  MIN_FORCE_RATIO="$MIN_FORCE_RATIO" \
+  MIN_BOUNTY="$MIN_BOUNTY" \
+  FALLBACK_MIN_BOUNTY="$FALLBACK_MIN_BOUNTY" \
+  ENABLE_FALLBACK=true \
+  PRIORITY_STACKS="$PRIORITY_STACKS" \
+  LOOP_DELAY_MS="$LOOP_DELAY_MS" \
+  node scripts/direct_profit_runner.js
+
+  echo "========== BLOCK_${i} COMPLETE =========="
+  sleep 1
+done
+

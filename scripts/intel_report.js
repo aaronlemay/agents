@@ -4,7 +4,7 @@ const { ethers } = require("ethers");
 require("dotenv").config({ path: "/Users/aaronlemay/.env" });
 
 const REPORT_PATH = "/Users/aaronlemay/agents/intel_report.md";
-const GAME_ADDR = "0x23e55f52C4215d7162861761C6063399E021BA3f";
+const GAME_ADDR = "0xfd21c1c28d58e420837e8057A227C3D432D289Ec";
 const RPC_URL = "https://sepolia.base.org";
 const LOOP_SECONDS = 20;
 
@@ -13,7 +13,7 @@ const POWER_PER_666_SPAWN = ethers.BigNumber.from(1332);
 const SPAWN_STEP = ethers.BigNumber.from(666);
 const MIN_SPAWN = ethers.BigNumber.from(666);
 const OVERKILL_RATIO = ethers.BigNumber.from(8);
-const SPAWN_COST_PER_UNIT = ethers.BigNumber.from(10);
+const SPAWN_COST_PER_UNIT = ethers.utils.parseEther("20");
 const HUB_STACK = 125;
 
 function getCoords(id) {
@@ -58,7 +58,7 @@ function spawnPlan(enemyPower) {
 
 function ratioNum(n, d) {
     if (d.lte(0)) return 0;
-    return Number(ethers.utils.formatEther(n.mul(10000).div(d))) / 10000;
+    return Number(n.mul(10000).div(d).toString()) / 10000;
 }
 
 function fmtNum(v) {
@@ -152,7 +152,7 @@ async function main() {
             }
 
             const spawnSorted = spawnCandidates
-                .filter((s) => s.roi >= 1.1)
+                .filter((s) => s.roi >= 1.18)
                 .sort((a, b) => {
                     const aThreat = topThreat && a.enemy.occupant.toLowerCase() === topThreat.addr ? 1 : 0;
                     const bThreat = topThreat && b.enemy.occupant.toLowerCase() === topThreat.addr ? 1 : 0;

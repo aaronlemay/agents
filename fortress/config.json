@@ -3,17 +3,17 @@
   "network": {
     "network_name": "basesepolia",
     "rpc_url": "https://sepolia.base.org",
-    "kill_game_addr": "0x23e55f52C4215d7162861761C6063399E021BA3f",
-    "kill_faucet_addr": "0x9Cc9568A59935a471a3Bc161f3327E1586F4624e"
+    "kill_game_addr": "0xfd21c1c28d58e420837e8057A227C3D432D289Ec",
+    "kill_faucet_addr": "0x258042B01c4B1Bc749f296B477F703FC6e8462Cd"
   },
   "settings": {
     "HUB_STACK": 125,
     "TARGET_POWER": 133200,
     "REPLENISH_AMT": 1332,
-    "LOOP_DELAY_SECONDS": 12,
-    "MAX_GAS_PRICE_GWEI": 3,
-    "HUB_PERIMETER": 3,
-    "DRY_RUN": true,
+    "LOOP_DELAY_SECONDS": 10,
+    "MAX_GAS_PRICE_GWEI": 1,
+    "HUB_PERIMETER": 2,
+    "DRY_RUN": false,
     "MIN_RAID_FORCE_RATIO": 6,
     "MIN_HUB_UNITS": 500000
   }

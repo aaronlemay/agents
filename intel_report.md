@@ -1,19 +1,3 @@
 # Intel Report
-- Updated: 2026-02-27T18:49:58.467Z
-- Block: 38224954
-- Wallet: 0x6646aDbdF4fe1275e43dE83b7cf5BA4541b8B23E
-- ETH: 0.000128821034984643
-- KILL: 100105361.278801166608732224
-- Top threat: 0x2fb363fbc806ee9e86ab406b8053875a9026be7d (601 stacks)
-
-## Top Executable Targets
-- Spawn+kill @157 target 0x2fb363fBc806EE9E86aB406B8053875A9026BE7D bounty 448,800 roi 4.81x
-- Spawn+kill @157 target 0x2fb363fBc806EE9E86aB406B8053875A9026BE7D bounty 448,800 roi 4.81x
-- Spawn+kill @157 target 0x2fb363fBc806EE9E86aB406B8053875A9026BE7D bounty 448,800 roi 4.81x
-- Spawn+kill @157 target 0x2fb363fBc806EE9E86aB406B8053875A9026BE7D bounty 448,800 roi 4.81x
-- Spawn+kill @157 target 0x2fb363fBc806EE9E86aB406B8053875A9026BE7D bounty 448,800 roi 4.81x
-- Spawn+kill @157 target 0x2fb363fBc806EE9E86aB406B8053875A9026BE7D bounty 448,800 roi 4.81x
-
-## Launch Queue (First 3 TX)
-- TX1 SPAWN_KILL: stack 157 spawn 9324 roi 4.81x on 0x2fb363fB | executable=true
-
+- Updated: 2026-03-02T03:14:43.637Z
+- Error: missing response (requestBody="{\"method\":\"eth_blockNumber\",\"params\":[],\"id\":10542,\"jsonrpc\":\"2.0\"}", requestMethod="POST", serverError={"errno":-3008,"code":"ENOTFOUND","syscall":"getaddrinfo","hostname":"sepolia.base.org"}, url="https://sepolia.base.org", code=SERVER_ERROR, version=web/5.8.0)

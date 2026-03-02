@@ -29,6 +29,10 @@ function strongestEnemy(enemies) {
     }, null);
 }
 
+function hasMethod(contract, name) {
+    return typeof contract[name] === "function";
+}
+
 async function countdown(seconds) {
     for (let i = seconds; i > 0; i--) {
         process.stdout.write(`\r[WAIT] Next scan in ${i}s... `);
@@ -59,8 +63,14 @@ async function main() {
     const killTokenAddr = await killGame.killToken();
     const killToken = new ethers.Contract(killTokenAddr, ['function balanceOf(address) view returns (uint256)', 'function allowance(address, address) view returns (uint256)', 'function approve(address, uint256) returns (bool)', 'function transfer(address, uint256) returns (bool)'], wallet);
 
-    const faucetAbi = ["function pullKill() external", "function hasClaimed(address) view returns (bool)"];
-    const killFaucet = new ethers.Contract(kill_faucet_addr, JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/abi/KILLFaucet.json'), 'utf8')).abi, wallet);
+    const killFaucet = (
+        kill_faucet_addr &&
+        kill_faucet_addr !== ethers.constants.AddressZero
+    ) ? new ethers.Contract(
+        kill_faucet_addr,
+        JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/abi/KILLFaucet.json'), 'utf8')).abi,
+        wallet
+    ) : null;
 
     const ALL_IDS = Array.from({length: 216}, (_, i) => i + 1);
     const PATROL_ZONE = ALL_IDS.filter(id => id !== HUB_STACK && getManhattanDist(HUB_STACK, id) <= HUB_PERIMETER);
@@ -68,18 +78,22 @@ async function main() {
 
     console.log(`\n--- FORTRESS AGENT: ATOMIC LIQUIDATION MODE ---`);
 
-    try {
-        const alreadyClaimed = await killFaucet.hasClaimed(address);
-        if (!alreadyClaimed) {
-            console.log(`[STARTUP] Attempting KILL Faucet pull...`);
-            const faucetTx = await killFaucet.pullKill({ gasLimit: 200000 });
-            await faucetTx.wait();
-            console.log(`[SUCCESS] 666,000 KILL pulled from faucet.`);
-        } else {
-            console.log(`[STARTUP] Faucet already claimed.`);
+    if (killFaucet && hasMethod(killFaucet, "hasClaimed") && hasMethod(killFaucet, "pullKill")) {
+        try {
+            const alreadyClaimed = await killFaucet.hasClaimed(address);
+            if (!alreadyClaimed) {
+                console.log(`[STARTUP] Attempting KILL Faucet pull...`);
+                const faucetTx = await killFaucet.pullKill({ gasLimit: 200000 });
+                await faucetTx.wait();
+                console.log(`[SUCCESS] 666,000 KILL pulled from faucet.`);
+            } else {
+                console.log(`[STARTUP] Faucet already claimed.`);
+            }
+        } catch (e) {
+            console.log(`[STARTUP] Faucet skip: ${e.reason || e.message}`);
         }
-    } catch (e) {
-        console.log(`[STARTUP] Faucet skip: ${e.reason || e.message}`);
+    } else {
+        console.log(`[STARTUP] Faucet unavailable on this deployment; continuing without faucet pull.`);
     }
 
     while (true) {
@@ -199,7 +213,7 @@ async function main() {
             }
             // PRIORITY 4: SPAWN (POWER CHECK)
             else if (totalPowerGlobal.lt(ethers.BigNumber.from(TARGET_POWER))) {
-                const spawnCost = ethers.BigNumber.from(REPLENISH_AMT).mul(10); // 10 KILL per unit
+                const spawnCost = ethers.BigNumber.from(REPLENISH_AMT).mul(20); // 20 KILL per unit
                 if (allow.lt(spawnCost)) {
                     console.log(`[AUTH] Approving KILL tokens...`);
                     const appTx = await killToken.connect(wallet).approve(kill_game_addr, ethers.constants.MaxUint256);

@@ -13,7 +13,7 @@ const GRID_SIZE = 216;
 const REAPER_POWER = ethers.BigNumber.from(666);
 const POWER_PER_666_SPAWN = ethers.BigNumber.from(1332);
 const SPAWN_STEP = ethers.BigNumber.from(666);
-const SPAWN_COST_PER_UNIT = ethers.BigNumber.from(10);
+const SPAWN_COST_PER_UNIT = ethers.utils.parseEther("20");
 
 function getCoords(id) {
     const v = Number(id) - 1;
@@ -26,7 +26,7 @@ function calcPower(units, reapers) {
 
 function ratioNum(n, d) {
     if (!d || d.lte(0)) return 0;
-    return Number(ethers.utils.formatEther(n.mul(10000).div(d))) / 10000;
+    return Number(n.mul(10000).div(d).toString()) / 10000;
 }
 
 function fmtKill(v) {

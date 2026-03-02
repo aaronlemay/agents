@@ -26,6 +26,7 @@ node /Users/aaronlemay/agents/team-alpha/meta-controller/controller.js --apply
 
 - `scout_hardening`: all DRY_RUN, preserve gas
 - `parasite_compound`: single live executor, farm leftovers
+- `ambush_compound`: seeder + parasite trap-cadence compounding
 - `honeypot_lure`: bait/probe posture under constrained edge
 - `sector_nuke_window`: timed burst play when bankroll and edge support it
 
@@ -33,3 +34,4 @@ node /Users/aaronlemay/agents/team-alpha/meta-controller/controller.js --apply
 
 - Without `--apply`: decision-only (no config mutation)
 - With `--apply`: updates each agent `settings.DRY_RUN` according to selected playbook
+- Enforces `constraints.max_parallel_live_agents` by automatically downgrading excess live agents to `dry_run`

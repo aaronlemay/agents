@@ -1,0 +1,19 @@
+{
+  "role": "seeder",
+  "network": {
+    "network_name": "basesepolia",
+    "rpc_url": "https://sepolia.base.org",
+    "kill_game_addr": "0xfd21c1c28d58e420837e8057A227C3D432D289Ec",
+    "kill_faucet_addr": "0x258042B01c4B1Bc749f296B477F703FC6e8462Cd"
+  },
+  "settings": {
+    "LOOP_DELAY_SECONDS": 10,
+    "SEED_UNITS": 666,
+    "MAX_SEED_TX_PER_CYCLE": 1,
+    "MAX_GAS_PRICE_GWEI": 0.2,
+    "MAX_GAS_LIMIT": 220000,
+    "MIN_ETH_BALANCE": "0.0002",
+    "DRY_RUN": true,
+    "MAX_CYCLES": 0
+  }
+}

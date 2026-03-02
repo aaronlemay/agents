@@ -3,8 +3,8 @@
   "network": {
     "network_name": "basesepolia",
     "rpc_url": "https://sepolia.base.org",
-    "kill_game_addr": "0x23e55f52C4215d7162861761C6063399E021BA3f",
-    "kill_faucet_addr": "0x9Cc9568A59935a471a3Bc161f3327E1586F4624e"
+    "kill_game_addr": "0xfd21c1c28d58e420837e8057A227C3D432D289Ec",
+    "kill_faucet_addr": "0x258042B01c4B1Bc749f296B477F703FC6e8462Cd"
   },
   "settings": {
     "HUB_STACK": 125,
@@ -14,9 +14,10 @@
     "OVERKILL_RATIO": 6,
     "MIN_FORCE_RATIO": 2.5,
     "MIN_BOUNTY_FOR_SPAWN": "9999999999",
+    "MIN_SPAWN_ROI": 1.15,
     "MAX_GAS_PRICE_GWEI": 1,
     "MAX_GAS_LIMIT": 180000,
-    "MIN_ETH_BALANCE": "0.00012",
-    "DRY_RUN": true
+    "MIN_ETH_BALANCE": "0.0002",
+    "DRY_RUN": false
   }
 }

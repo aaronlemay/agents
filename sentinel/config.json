@@ -1,0 +1,19 @@
+{
+  "role": "sentinel",
+  "network": {
+    "network_name": "basesepolia",
+    "rpc_url": "https://sepolia.base.org",
+    "kill_game_addr": "0xfd21c1c28d58e420837e8057A227C3D432D289Ec",
+    "kill_faucet_addr": "0x258042B01c4B1Bc749f296B477F703FC6e8462Cd"
+  },
+  "settings": {
+    "HUB_STACK": 125,
+    "LOOP_DELAY_SECONDS": 10,
+    "MIN_DIRECT_FORCE_RATIO": 2,
+    "MIN_ETH_BALANCE": "0.0002",
+    "MAX_GAS_PRICE_GWEI": 1,
+    "MAX_GAS_LIMIT": 220000,
+    "DRY_RUN": true,
+    "MAX_CYCLES": 0
+  }
+}

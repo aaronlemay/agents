@@ -13,7 +13,7 @@ const GRID_SIZE = 216;
 const REAPER_POWER = ethers.BigNumber.from(666);
 const POWER_PER_666_SPAWN = ethers.BigNumber.from(1332);
 const SPAWN_STEP = ethers.BigNumber.from(666);
-const SPAWN_COST_PER_UNIT = ethers.BigNumber.from(10);
+const SPAWN_COST_PER_UNIT = ethers.utils.parseEther("20");
 
 function getCoords(id) {
     const v = Number(id) - 1;
@@ -73,6 +73,7 @@ async function main() {
         OVERKILL_RATIO: ethers.BigNumber.from(settings.OVERKILL_RATIO ?? 8),
         MIN_FORCE_RATIO: Number(settings.MIN_FORCE_RATIO ?? 4),
         MIN_BOUNTY_FOR_SPAWN: ethers.utils.parseEther((settings.MIN_BOUNTY_FOR_SPAWN ?? "200000").toString()),
+        MIN_SPAWN_ROI: Number(settings.MIN_SPAWN_ROI ?? 1.15),
         MAX_GAS_PRICE_GWEI: Number(settings.MAX_GAS_PRICE_GWEI ?? 1),
         MAX_GAS_LIMIT: Number(settings.MAX_GAS_LIMIT ?? 220000),
         MIN_ETH_BALANCE: ethers.utils.parseEther((settings.MIN_ETH_BALANCE ?? "0.0002").toString()),
@@ -177,7 +178,7 @@ async function main() {
                 ]));
             } else {
                 const bestSpawn = spawnTargets
-                    .filter((t) => t.roi > 1 && t.enemy.pendingBounty.gte(conf.MIN_BOUNTY_FOR_SPAWN))
+                    .filter((t) => t.roi >= conf.MIN_SPAWN_ROI && t.enemy.pendingBounty.gte(conf.MIN_BOUNTY_FOR_SPAWN))
                     .sort((a, b) => {
                         const aDom = dominant && a.enemy.occupant.toLowerCase() === dominant.addr ? 1 : 0;
                         const bDom = dominant && b.enemy.occupant.toLowerCase() === dominant.addr ? 1 : 0;

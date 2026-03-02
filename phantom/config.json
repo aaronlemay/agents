@@ -3,15 +3,15 @@
   "network": {
     "network_name": "basesepolia",
     "rpc_url": "https://sepolia.base.org",
-    "kill_game_addr": "0x23e55f52C4215d7162861761C6063399E021BA3f",
-    "kill_faucet_addr": "0x9Cc9568A59935a471a3Bc161f3327E1586F4624e"
+    "kill_game_addr": "0xfd21c1c28d58e420837e8057A227C3D432D289Ec",
+    "kill_faucet_addr": "0x258042B01c4B1Bc749f296B477F703FC6e8462Cd"
   },
   "settings": {
     "HUB_STACK": 125,
     "LOOP_DELAY_SECONDS": 12,
     "MAX_GAS_PRICE_GWEI": 2,
     "MIN_FORCE_RATIO": 4,
-    "SPAWN_PROFITABILITY_THRESHOLD": 1.1,
+    "SPAWN_PROFITABILITY_THRESHOLD": 1.18,
     "OVERKILL_RATIO": 8,
     "MIN_SPAWN": 666,
     "SPAWN_STEP": 666,
@@ -19,8 +19,8 @@
     "TOP_TARGET_WINDOW": 3,
     "CLUSTER_RADIUS": 1,
     "CLUSTER_WEIGHT": 0.25,
-    "MIN_ETH_BALANCE": "0.003",
-    "MIN_HUB_RESERVE": "500000",
+    "MIN_ETH_BALANCE": "0.0002",
+    "MIN_HUB_RESERVE": "250000",
     "SCOUT_SEND_UNITS": "2664",
     "DRY_RUN": true
   }

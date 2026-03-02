@@ -12,7 +12,7 @@ const BRIGHT = "\x1b[1m";
 const GRID_SIZE = 216;
 const REAPER_POWER = ethers.BigNumber.from(666);
 const POWER_PER_666_SPAWN = ethers.BigNumber.from(1332);
-const SPAWN_COST_PER_UNIT = ethers.BigNumber.from(10);
+const SPAWN_COST_PER_UNIT = ethers.utils.parseEther("20");
 
 function getCoords(id) {
     const v = Number(id) - 1;

@@ -1,3 +1,4 @@
 .DS_Store
+.env
 _recovery_*/
 recovery_*.tgz

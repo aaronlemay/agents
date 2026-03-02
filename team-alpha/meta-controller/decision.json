@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T18:42:21.135Z",
+  "generatedAt": "2026-03-01T03:12:52.624Z",
   "playbook": {
     "id": "scout_hardening",
     "summary": "All agents in DRY_RUN; gather intel and avoid gas burn.",
@@ -8,63 +8,41 @@
       "aftershock": "dry_run",
       "phantom": "dry_run",
       "fortress": "dry_run",
-      "layer-harvester": "dry_run"
+      "layer-harvester": "dry_run",
+      "sentinel": "dry_run",
+      "parasite": "dry_run",
+      "seeder": "dry_run"
     }
   },
-  "reason": "ETH 0.000029 below min_live_eth 0.0003",
+  "reason": "ETH 0.000129 below min_live_eth 0.0002",
   "state": {
-    "updated": "2026-02-26T18:42:05.266Z",
-    "block": 38181517,
+    "updated": "2026-02-27T18:49:58.467Z",
+    "block": 38224954,
     "wallet": "0x6646aDbdF4fe1275e43dE83b7cf5BA4541b8B23E",
-    "eth": 0.000028821034984643,
+    "eth": 0.000128821034984643,
     "kill": 100105361.27880117,
     "threatAddr": "0x2fb363fbc806ee9e86ab406b8053875a9026be7d",
-    "threatStacks": 244,
-    "topRoi": 5,
-    "opportunities": 6
+    "threatStacks": 601,
+    "topRoi": 4.81,
+    "opportunities": 6,
+    "executableQueue": 1
   },
   "thresholds": {
-    "min_live_eth": 0.0003,
-    "min_compound_eth": 0.0015,
-    "high_threat_stacks": 200,
+    "min_live_eth": 0.0002,
+    "min_compound_eth": 0.0009,
+    "high_threat_stacks": 150,
     "max_failure_streak": 2,
-    "min_viable_roi": 1.15
+    "min_viable_roi": 1.18
   },
   "constraints": {
-    "max_eth_spend_per_tx": 0.00012,
-    "max_parallel_live_agents": 1
+    "max_eth_spend_per_tx": 0.00009,
+    "max_parallel_live_agents": 2
   },
   "applyResult": {
-    "applyMode": true,
-    "updated": 5,
-    "skipped": 0,
+    "applyMode": false,
+    "updated": 0,
+    "skipped": 8,
     "failed": 0,
-    "details": [
-      {
-        "agent": "sniper",
-        "status": "updated",
-        "note": "DRY_RUN=true"
-      },
-      {
-        "agent": "aftershock",
-        "status": "updated",
-        "note": "DRY_RUN=true"
-      },
-      {
-        "agent": "phantom",
-        "status": "updated",
-        "note": "DRY_RUN=true"
-      },
-      {
-        "agent": "fortress",
-        "status": "updated",
-        "note": "DRY_RUN=true"
-      },
-      {
-        "agent": "layer-harvester",
-        "status": "updated",
-        "note": "DRY_RUN=true"
-      }
-    ]
+    "details": []
   }
 }

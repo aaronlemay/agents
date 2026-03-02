@@ -3,29 +3,30 @@
   "network": {
     "network_name": "basesepolia",
     "rpc_url": "https://sepolia.base.org",
-    "kill_game_addr": "0x23e55f52C4215d7162861761C6063399E021BA3f",
-    "kill_faucet_addr": "0x9Cc9568A59935a471a3Bc161f3327E1586F4624e"
+    "kill_game_addr": "0xfd21c1c28d58e420837e8057A227C3D432D289Ec",
+    "kill_faucet_addr": "0x258042B01c4B1Bc749f296B477F703FC6e8462Cd"
   },
   "settings": {
     "HUB_STACK": 125,
-    "LOOP_DELAY_SECONDS": 6,
+    "LOOP_DELAY_SECONDS": 5,
     "TOP_LAYERS": 6,
-    "MIN_DIRECT_FORCE_RATIO": 1.1,
-    "MIN_SPAWN_FORCE_RATIO": 2.2,
-    "MIN_SPAWN_ROI": 1,
-    "MIN_BOUNTY_FOR_SPAWN": "5000",
+    "MIN_DIRECT_FORCE_RATIO": 10,
+    "MIN_SPAWN_FORCE_RATIO": 2.5,
+    "MIN_SPAWN_ROI": 2,
+    "MIN_BOUNTY_FOR_SPAWN": "20000",
     "MAX_SPAWN_UNITS": "3330",
     "ENABLE_SEED_MODE": true,
     "SEED_UNITS": "666",
     "LOW_TIER_MAX_BOUNTY": "1500000",
     "LOW_TIER_MAX_POWER": "250000",
     "EXCLUDE_TOP_THREAT": false,
-    "OVERKILL_RATIO": 6,
+    "OVERKILL_RATIO": 5,
     "MAX_GAS_PRICE_GWEI": 0.2,
     "MAX_GAS_LIMIT": 220000,
-    "MAX_ETH_SPEND_PER_TX": "0.00009",
-    "MIN_ETH_BALANCE": "0.00008",
+    "MAX_ETH_SPEND_PER_TX": "0.00007",
+    "MIN_ETH_BALANCE": "0.0002",
     "PAUSE_AFTER_FAILURES": 2,
-    "DRY_RUN": true
+    "DRY_RUN": true,
+    "MAX_CYCLES": 0
   }
 }

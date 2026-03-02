@@ -12,7 +12,7 @@ const BRIGHT = "\x1b[1m";
 const GRID_SIZE = 216;
 const REAPER_POWER = ethers.BigNumber.from(666);
 const POWER_PER_666_SPAWN = ethers.BigNumber.from(1332);
-const SPAWN_COST_PER_UNIT = ethers.BigNumber.from(10);
+const SPAWN_COST_PER_UNIT = ethers.utils.parseEther("20");
 
 function getCoords(id) {
     const v = Number(id) - 1;
@@ -50,7 +50,7 @@ function roundUpToStep(value, step) {
 
 function toFloatRatio(numerator, denominator) {
     if (denominator.lte(0)) return 0;
-    return parseFloat(ethers.utils.formatEther(numerator.mul(10000).div(denominator))) / 10000;
+    return Number(numerator.mul(10000).div(denominator).toString()) / 10000;
 }
 
 function calcSpawnPlan(enemyPower, cfg) {
@@ -73,6 +73,10 @@ function pickHighestBountyEnemy(enemies) {
     return enemies.reduce((best, next) => (
         !best || next.pendingBounty.gt(best.pendingBounty) ? next : best
     ), null);
+}
+
+function hasMethod(contract, name) {
+    return typeof contract[name] === "function";
 }
 
 async function main() {
@@ -122,29 +126,40 @@ async function main() {
     ];
     const killToken = new ethers.Contract(killTokenAddr, erc20Abi, wallet);
 
-    const killFaucet = new ethers.Contract(
+    const killFaucet = (
+        kill_faucet_addr &&
+        kill_faucet_addr !== ethers.constants.AddressZero
+    ) ? new ethers.Contract(
         kill_faucet_addr,
         JSON.parse(fs.readFileSync(path.join(__dirname, "../../data/abi/KILLFaucet.json"), "utf8")).abi,
         wallet
-    );
+    ) : null;
 
     console.log(`${BRIGHT}--- SNIPER AGENT ONLINE ---${RES}`);
 
-    try {
-        const alreadyClaimed = await killFaucet.hasClaimed(wallet.address);
-        if (!alreadyClaimed) {
-            console.log(`${YEL}[STARTUP] Claiming faucet...${RES}`);
-            const faucetTx = await killFaucet.pullKill({ gasLimit: 200000 });
-            await faucetTx.wait();
-            console.log(`${CYA}[SUCCESS] 666,000 KILL claimed.${RES}`);
-        } else {
-            console.log("[STARTUP] Faucet already claimed.");
+    if (killFaucet && hasMethod(killFaucet, "hasClaimed") && hasMethod(killFaucet, "pullKill")) {
+        try {
+            const alreadyClaimed = await killFaucet.hasClaimed(wallet.address);
+            if (!alreadyClaimed) {
+                console.log(`${YEL}[STARTUP] Claiming faucet...${RES}`);
+                const faucetTx = await killFaucet.pullKill({ gasLimit: 200000 });
+                await faucetTx.wait();
+                console.log(`${CYA}[SUCCESS] 666,000 KILL claimed.${RES}`);
+            } else {
+                console.log("[STARTUP] Faucet already claimed.");
+            }
+        } catch (e) {
+            console.log(`${PNK}[STARTUP] Faucet skipped: ${e.reason || e.message}${RES}`);
         }
-    } catch (e) {
-        console.log(`${PNK}[STARTUP] Faucet skipped: ${e.reason || e.message}${RES}`);
+    } else {
+        console.log(`${YEL}[STARTUP] Faucet unavailable on this deployment; continuing without faucet pull.${RES}`);
     }
 
     let hasTreasuryStats = true;
+    const targetCooldownUntil = new Map();
+    const targetFailCount = new Map();
+    const BASE_COOLDOWN_MS = 60_000;
+    const MAX_COOLDOWN_MS = 10 * 60_000;
     while (true) {
         try {
             const [ethBal, killBal, killAllow] = await Promise.all([
@@ -152,17 +167,23 @@ async function main() {
                 killToken.balanceOf(wallet.address),
                 killToken.allowance(wallet.address, kill_game_addr)
             ]);
+            const nowMs = Date.now();
+            for (const [k, until] of targetCooldownUntil.entries()) {
+                if (until <= nowMs) targetCooldownUntil.delete(k);
+            }
             let treasuryStats = {
                 totalTreasury: ethers.BigNumber.from(0),
                 globalMaxBounty: ethers.BigNumber.from(0)
             };
-            if (hasTreasuryStats) {
+            if (hasTreasuryStats && hasMethod(killGame, "getTreasuryStats")) {
                 try {
                     treasuryStats = await killGame.getTreasuryStats();
                 } catch (_err) {
                     hasTreasuryStats = false;
                     console.log(`${YEL}[WARN] getTreasuryStats unavailable on this deployment; continuing without treasury metrics.${RES}`);
                 }
+            } else {
+                hasTreasuryStats = false;
             }
 
             const scanIds = Array.from({ length: GRID_SIZE }, (_, i) => i + 1);
@@ -259,7 +280,7 @@ async function main() {
             const candidateTargetsBase = dominantThreat
                 ? (nearHubTargets.length > 0 ? nearHubTargets : rankedTargets)
                 : rankedTargets;
-            const candidateTargets = dominantThreat
+            const candidateTargetsRaw = dominantThreat
                 ? candidateTargetsBase.slice().sort((a, b) => {
                     const aThreat = a.enemy.occupant.toLowerCase() === dominantThreat.addr ? 1 : 0;
                     const bThreat = b.enemy.occupant.toLowerCase() === dominantThreat.addr ? 1 : 0;
@@ -268,7 +289,11 @@ async function main() {
                     return b.roiRatio - a.roiRatio;
                 })
                 : candidateTargetsBase;
-            const best = candidateTargets[0];
+            const candidateTargets = candidateTargetsRaw.filter((t) => {
+                const key = `${t.id}:${t.enemy.occupant.toLowerCase()}`;
+                return (targetCooldownUntil.get(key) || 0) <= nowMs;
+            });
+            const best = (candidateTargets.length > 0 ? candidateTargets : candidateTargetsRaw)[0];
 
             console.clear();
             console.log(`${BRIGHT}--- SNIPER AGENT | STATUS ---${RES}`);
@@ -308,6 +333,7 @@ async function main() {
             });
 
             const calls = [];
+            let attemptedTargetKey = null;
             let defendedHub = false;
             const directKill = directKillOps
                 .filter((op) => op.forceRatio >= cfg.DIRECT_KILL_MIN_FORCE_RATIO)
@@ -331,6 +357,7 @@ async function main() {
                             hubSelf.reapers
                         ])
                     );
+                    attemptedTargetKey = `${cfg.HUB_STACK}:${hubEnemy.occupant.toLowerCase()}`;
                     defendedHub = true;
                 } else {
                     console.log(`\n${YEL}[DEFENSE] Hub touched but force ${hubForceRatio.toFixed(2)}x below ${cfg.MIN_FORCE_RATIO}x; switching to counter actions.${RES}`);
@@ -347,6 +374,7 @@ async function main() {
                         directKill.self.reapers
                     ])
                 );
+                attemptedTargetKey = `${directKill.id}:${directKill.enemy.occupant.toLowerCase()}`;
             }
             // Priority 3: Under layer-wipe pressure, consolidate first.
             else if (!defendedHub && dominantThreat && myStrandedStacks.length > 0) {
@@ -376,6 +404,7 @@ async function main() {
                             best.spawnReaper
                         ])
                     );
+                    attemptedTargetKey = `${best.id}:${best.enemy.occupant.toLowerCase()}`;
                 }
             }
             // Priority 5: Consolidate one stranded stack.
@@ -393,7 +422,18 @@ async function main() {
                     console.log(`${YEL}[HOLD] ETH ${ethers.utils.formatEther(ethBal)} below floor ${ethers.utils.formatEther(cfg.MIN_ETH_BALANCE)}; skipping tx.${RES}`);
                 } else {
                 // Pre-flight simulation to avoid revert costs.
-                await killGame.callStatic.multicall(calls);
+                try {
+                    await killGame.callStatic.multicall(calls);
+                } catch (simErr) {
+                    if (attemptedTargetKey) {
+                        const nextFails = (targetFailCount.get(attemptedTargetKey) || 0) + 1;
+                        targetFailCount.set(attemptedTargetKey, nextFails);
+                        const cooldown = Math.min(BASE_COOLDOWN_MS * nextFails, MAX_COOLDOWN_MS);
+                        targetCooldownUntil.set(attemptedTargetKey, nowMs + cooldown);
+                        console.log(`${YEL}[COOLDOWN] ${attemptedTargetKey} simulation failed; cooling ${Math.round(cooldown / 1000)}s.${RES}`);
+                    }
+                    throw simErr;
+                }
                 if (cfg.DRY_RUN) {
                     console.log(`${YEL}[DRY_RUN] Simulation passed. Transaction not sent.${RES}`);
                 } else {
@@ -411,12 +451,24 @@ async function main() {
                     if (ethBal.lte(txCostWei.mul(105).div(100))) {
                         console.log(`${YEL}[HOLD] Est. tx cost ${ethers.utils.formatEther(txCostWei)} ETH exceeds safe spend at current balance ${ethers.utils.formatEther(ethBal)}.${RES}`);
                     } else {
-                        const tx = await killGame.multicall(calls, {
-                            gasLimit,
-                            gasPrice
-                        });
-                        console.log(`${CYA}>> [TX]: ${tx.hash}${RES}`);
-                        await tx.wait();
+                        try {
+                            const tx = await killGame.multicall(calls, {
+                                gasLimit,
+                                gasPrice
+                            });
+                            console.log(`${CYA}>> [TX]: ${tx.hash}${RES}`);
+                            await tx.wait();
+                            if (attemptedTargetKey) targetFailCount.delete(attemptedTargetKey);
+                        } catch (txErr) {
+                            if (attemptedTargetKey) {
+                                const nextFails = (targetFailCount.get(attemptedTargetKey) || 0) + 1;
+                                targetFailCount.set(attemptedTargetKey, nextFails);
+                                const cooldown = Math.min(BASE_COOLDOWN_MS * nextFails, MAX_COOLDOWN_MS);
+                                targetCooldownUntil.set(attemptedTargetKey, Date.now() + cooldown);
+                                console.log(`${YEL}[COOLDOWN] ${attemptedTargetKey} tx failed; cooling ${Math.round(cooldown / 1000)}s.${RES}`);
+                            }
+                            throw txErr;
+                        }
                     }
                 }
                 }

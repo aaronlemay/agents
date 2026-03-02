@@ -27,6 +27,7 @@ function parseIntelReport(reportPath) {
     let threatStacks = 0;
     let topRoi = 0;
     let opportunities = 0;
+    let executableQueue = 0;
 
     for (const line of lines) {
         if (line.startsWith("- Updated: ")) updated = line.replace("- Updated: ", "").trim();
@@ -47,6 +48,7 @@ function parseIntelReport(reportPath) {
             const rm = line.match(/roi\s+([0-9.]+)x/i) || line.match(/force\s+([0-9.]+)x/i);
             if (rm) topRoi = Math.max(topRoi, Number(rm[1]));
         }
+        if (line.includes("executable=true")) executableQueue += 1;
     }
 
     return {
@@ -58,7 +60,8 @@ function parseIntelReport(reportPath) {
         threatAddr,
         threatStacks,
         topRoi,
-        opportunities
+        opportunities,
+        executableQueue
     };
 }
 
@@ -74,6 +77,12 @@ function pickPlaybook(state, config) {
     }
 
     if (state.eth < t.min_compound_eth) {
+        if (state.executableQueue >= 1 && state.topRoi >= t.min_viable_roi) {
+            return {
+                id: "ambush_compound",
+                reason: `Lean bankroll with executable queue (${state.executableQueue}) and edge (${state.topRoi.toFixed(2)}x)`
+            };
+        }
         if (state.opportunities > 0 && state.topRoi >= t.min_viable_roi) {
             return {
                 id: "parasite_compound",
@@ -86,10 +95,10 @@ function pickPlaybook(state, config) {
         };
     }
 
-    if (state.threatStacks >= t.high_threat_stacks && state.topRoi >= t.min_viable_roi) {
+    if (state.threatStacks >= t.high_threat_stacks && state.topRoi >= t.min_viable_roi && state.executableQueue >= 1) {
         return {
             id: "sector_nuke_window",
-            reason: `High threat density (${state.threatStacks} stacks) and enough edge for timed burst`
+            reason: `High threat density (${state.threatStacks} stacks), executable queue, and enough edge for timed burst`
         };
     }
 
@@ -97,6 +106,23 @@ function pickPlaybook(state, config) {
         id: "parasite_compound",
         reason: "Default compounding profile on stable bankroll"
     };
+}
+
+function enforceLiveCap(playbook, cfg) {
+    const maxLive = Number((cfg.constraints && cfg.constraints.max_parallel_live_agents) || 1);
+    if (!Number.isFinite(maxLive) || maxLive < 1) return playbook;
+
+    const out = JSON.parse(JSON.stringify(playbook));
+    const live = Object.entries(out.agent_modes).filter(([, mode]) => mode === "live").map(([agent]) => agent);
+    if (live.length <= maxLive) return out;
+
+    const priority = ["layer-harvester", "parasite", "sentinel", "sniper", "aftershock", "seeder", "phantom", "fortress"];
+    const allowed = new Set(priority.filter((a) => live.includes(a)).slice(0, maxLive));
+
+    for (const agent of live) {
+        if (!allowed.has(agent)) out.agent_modes[agent] = "dry_run";
+    }
+    return out;
 }
 
 function getPlaybook(playbooks, id, fallback) {
@@ -118,6 +144,7 @@ function toMarkdown(decision) {
     lines.push(`- KILL: ${decision.state.kill}`);
     lines.push(`- Top threat: ${decision.state.threatAddr || "none"} (${decision.state.threatStacks} stacks)`);
     lines.push(`- Opportunity count: ${decision.state.opportunities}`);
+    lines.push(`- Executable queue size: ${decision.state.executableQueue}`);
     lines.push(`- Top ROI observed: ${decision.state.topRoi.toFixed(2)}x`);
     lines.push(``);
     lines.push("## Agent Modes");
@@ -186,7 +213,8 @@ function main() {
     const applyMode = process.argv.includes("--apply") || cfg.defaults.apply_changes === true;
     const state = parseIntelReport(cfg.paths.intel_report);
     const chosen = pickPlaybook(state, cfg);
-    const playbook = getPlaybook(pb.playbooks, chosen.id, cfg.defaults.base_playbook);
+    const basePlaybook = getPlaybook(pb.playbooks, chosen.id, cfg.defaults.base_playbook);
+    const playbook = enforceLiveCap(basePlaybook, cfg);
     const applyResult = applyPlaybook(playbook, cfg, applyMode);
 
     const decision = {

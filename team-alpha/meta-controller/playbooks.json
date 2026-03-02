@@ -8,7 +8,10 @@
         "aftershock": "dry_run",
         "phantom": "dry_run",
         "fortress": "dry_run",
-        "layer-harvester": "dry_run"
+        "layer-harvester": "dry_run",
+        "sentinel": "dry_run",
+        "parasite": "dry_run",
+        "seeder": "dry_run"
       }
     },
     {
@@ -19,18 +22,38 @@
         "aftershock": "dry_run",
         "phantom": "dry_run",
         "fortress": "dry_run",
-        "layer-harvester": "live"
+        "layer-harvester": "live",
+        "sentinel": "dry_run",
+        "parasite": "dry_run",
+        "seeder": "dry_run"
+      }
+    },
+    {
+      "id": "ambush_compound",
+      "summary": "Unexpected trap cadence: seeder creates bait while parasite harvests reactive fights.",
+      "agent_modes": {
+        "sniper": "dry_run",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "dry_run",
+        "sentinel": "dry_run",
+        "parasite": "live",
+        "seeder": "live"
       }
     },
     {
       "id": "honeypot_lure",
       "summary": "Place bait/seed actions, then switch to local direct-kill defense.",
       "agent_modes": {
-        "sniper": "live",
+        "sniper": "dry_run",
         "aftershock": "dry_run",
         "phantom": "dry_run",
         "fortress": "dry_run",
-        "layer-harvester": "live"
+        "layer-harvester": "dry_run",
+        "sentinel": "live",
+        "parasite": "dry_run",
+        "seeder": "live"
       }
     },
     {
@@ -38,10 +61,13 @@
       "summary": "Time-bounded high-force burst on one section/layer when bankroll supports it.",
       "agent_modes": {
         "sniper": "live",
-        "aftershock": "live",
+        "aftershock": "dry_run",
         "phantom": "dry_run",
         "fortress": "dry_run",
-        "layer-harvester": "live"
+        "layer-harvester": "live",
+        "sentinel": "dry_run",
+        "parasite": "dry_run",
+        "seeder": "dry_run"
       }
     }
   ]

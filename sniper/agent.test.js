@@ -18,7 +18,11 @@ function run() {
     assert.strictEqual(smallPlan.spawnAmt.toString(), "666", "minimum spawn should be 666");
     assert.strictEqual(smallPlan.spawnReaper.toString(), "1", "666 spawn should emit 1 reaper");
     assert.strictEqual(smallPlan.spawnPower.toString(), "1332", "666 spawn should produce 1332 power");
-    assert.strictEqual(smallPlan.attackCost.toString(), "6660", "attack cost is unit-based");
+    assert.strictEqual(
+        smallPlan.attackCost.toString(),
+        ethers.utils.parseEther("13320").toString(),
+        "attack cost is unit-based"
+    );
 
     const enemyPowerLarge = calcPower(ethers.BigNumber.from(2000), ethers.BigNumber.from(3));
     const largePlan = calcSpawnPlan(enemyPowerLarge, cfg);

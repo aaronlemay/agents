@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "team": "Agent Team Alpha",
+  "presets": {
+    "safe_income": {
+      "max_parallel_live_agents": 1,
+      "min_live_eth": 0.0002,
+      "max_eth_spend_per_tx": 0.00007,
+      "max_failure_streak": 1,
+      "prefer_direct_kill": true
+    },
+    "balanced": {
+      "max_parallel_live_agents": 2,
+      "min_live_eth": 0.0009,
+      "max_eth_spend_per_tx": 0.00009,
+      "max_failure_streak": 2,
+      "prefer_direct_kill": true
+    },
+    "aggro_push": {
+      "max_parallel_live_agents": 2,
+      "min_live_eth": 0.0018,
+      "max_eth_spend_per_tx": 0.00014,
+      "max_failure_streak": 3,
+      "prefer_direct_kill": false
+    }
+  },
+  "playbooks": {
+    "scout_hardening": {
+      "description": "All dry run, gather intelligence",
+      "agent_modes": {
+        "sniper": "dry_run",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "dry_run",
+        "sentinel": "dry_run",
+        "parasite": "dry_run",
+        "seeder": "dry_run"
+      }
+    },
+    "parasite_compound": {
+      "description": "Single live compounding executor with shadow farming",
+      "agent_modes": {
+        "sniper": "dry_run",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "live",
+        "sentinel": "dry_run",
+        "parasite": "dry_run",
+        "seeder": "dry_run"
+      }
+    },
+    "honeypot_lure": {
+      "description": "Seed + defend trap loops",
+      "agent_modes": {
+        "sniper": "dry_run",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "dry_run",
+        "sentinel": "live",
+        "parasite": "dry_run",
+        "seeder": "live"
+      }
+    },
+    "ambush_compound": {
+      "description": "Seeder baits while parasite farms reactive conflicts",
+      "agent_modes": {
+        "sniper": "dry_run",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "dry_run",
+        "sentinel": "dry_run",
+        "parasite": "live",
+        "seeder": "live"
+      }
+    },
+    "sector_nuke_window": {
+      "description": "Time-boxed burst on one high-value sector",
+      "agent_modes": {
+        "sniper": "live",
+        "aftershock": "dry_run",
+        "phantom": "dry_run",
+        "fortress": "dry_run",
+        "layer-harvester": "live",
+        "sentinel": "dry_run",
+        "parasite": "dry_run",
+        "seeder": "dry_run"
+      }
+    }
+  }
+}

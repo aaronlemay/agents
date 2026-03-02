@@ -1,0 +1,21 @@
+{
+  "role": "sniper",
+  "network": {
+    "network_name": "basesepolia",
+    "rpc_url": "https://sepolia.base.org",
+    "kill_game_addr": "0xfd21c1c28d58e420837e8057A227C3D432D289Ec",
+    "kill_faucet_addr": "0x258042B01c4B1Bc749f296B477F703FC6e8462Cd"
+  },
+  "settings": {
+    "HUB_STACK": 125,
+    "LOOP_DELAY_SECONDS": 12,
+    "KILL_MULTIPLIER": 3,
+    "SPAWN_PROFITABILITY_THRESHOLD": 1.15,
+    "MIN_SPAWN": 666,
+    "SUBGRAPH_URL": "https://api.goldsky.com/api/public/project_cmlgypvyy520901u8f5821f19/subgraphs/kill-testnet-subgraph/1.0.2/gn",
+    "MIN_BOUNTY_FOR_SPAWN": "15000",
+    "MAX_GAS_LIMIT": 1400000,
+    "MAX_GAS_PRICE_GWEI": 1,
+    "DRY_RUN": true
+  }
+}
